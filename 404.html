@@ -58,14 +58,17 @@
         try {
           // Parse the JSON response
           var payload = JSON.parse(xhr.response);
-          var message = payload.message;
 
-          if (message === "Not Found") {
+          // Check if the issue is found based on the response status and message
+          if (xhr.status === 200) {
+            // Display the issue content
+            displayIssue(payload);
+          } else if (xhr.status === 404 && payload.message === "Not Found") {
             // Handle error: Issue not found
             issueContent.innerHTML = "<p>Error: Issue not found.</p>";
           } else {
-            // Display the issue content
-            displayIssue(payload);
+            // Handle other errors
+            issueContent.innerHTML = "<p>Error: An unexpected error occurred.</p>";
           }
         } catch (e) {
           // Handle error: Parsing or other error
