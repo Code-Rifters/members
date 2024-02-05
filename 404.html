@@ -1,82 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>GitHub Issue Viewer</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      h1 {
-        color: #0366d6;
-      }
-      p {
-        color: #333;
-      }
-    </style>
-    <script>
-      /**
-       * Configuration goes here
-       */
-      // Format: https://api.github.com/repos/{owner}/{repo}/issues/
-      var GITHUB_ISSUES_LINK =
-        "https://api.github.com/repos/Code-Rifters/-/issues/";
-      var PATH_SEGMENTS_TO_SKIP = 0;
+<head>
+  <meta charset="utf-8">
+  <title>GitHub Issue Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #0366d6;
+    }
+    p {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="issueContent"></div>
 
-      /**
-       * DO NOT TOUCH ANYTHING BELOW THIS COMMENT UNLESS YOU KNOW WHAT YOU ARE DOING
-       */
-      function displayIssue(issue) {
-        var title = issue.title;
-        var body = issue.body;
+  <script>
+    // Configuration goes here
+    // Format: https://api.github.com/repos/{owner}/{repo}/issues/
+    var GITHUB_ISSUES_LINK = "https://api.github.com/repos/Code-Rifters/-/issues/";
+    var PATH_SEGMENTS_TO_SKIP = 0;
 
-        var html = '<h1>' + title + '</h1>';
-        html += '<p>' + body + '</p>';
+    function isUrl(url) {
+      // Regex from https://stackoverflow.com/a/3809435, with a modification to allow for TLDs of up to 24 characters
+      return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,24}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)+$/.test(url);
+    }
 
-        document.body.innerHTML = html;
-      }
+    function displayIssue(issue) {
+      var issueContent = document.getElementById("issueContent");
+      var title = issue.title;
+      var body = issue.body;
 
-      function redirect() {
-        var location = window.location;
-        var issueNumber = location.pathname.split("/")[
-          PATH_SEGMENTS_TO_SKIP + 1
-        ];
-        var homepage =
-          location.protocol +
-          "//" +
-          location.hostname +
-          (location.port ? ":" + location.port : "") +
-          "/" +
-          location.pathname.split("/")[PATH_SEGMENTS_TO_SKIP];
+      var html = '<h1>' + title + '</h1>';
+      html += '<p>' + body + '</p>';
 
-        var xhr = new XMLHttpRequest();
+      issueContent.innerHTML = html;
+    }
 
-        xhr.onload = function () {
-          try {
-            if (xhr.status === 200) {
-              var payload = JSON.parse(xhr.responseText);
-              displayIssue(payload);
-            } else {
-              console.error("Failed to fetch issue. Status code: " + xhr.status);
-              location.replace(homepage);
-            }
-          } catch (e) {
-            console.error("Error parsing response:", e);
-            location.replace(homepage);
+    function redirect() {
+      var location = window.location;
+      var issueNumber = location.pathname.split("/")[PATH_SEGMENTS_TO_SKIP + 1];
+      var homepage = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "") + "/" + location.pathname.split("/")[PATH_SEGMENTS_TO_SKIP];
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.onload = function () {
+        try {
+          var payload = JSON.parse(xhr.response);
+          var message = payload.message;
+
+          if (message === "Not Found") {
+            // Handle error: Issue not found
+            issueContent.innerHTML = "<p>Error: Issue not found.</p>";
+          } else {
+            displayIssue(payload);
           }
-        };
+        } catch (e) {
+          // Handle error: Parsing or other error
+          issueContent.innerHTML = "<p>Error: An error occurred.</p>";
+        }
+      };
 
-        xhr.onerror = function () {
-          console.error("Network error occurred.");
-          location.replace(homepage);
-        };
-        xhr.open("GET", GITHUB_ISSUES_LINK + issueNumber);
-        xhr.send();
-      }
+      xhr.onerror = function () {
+        // Handle error: Network or other error
+        issueContent.innerHTML = "<p>Error: Could not fetch issue.</p>";
+      };
 
-      redirect();
-    </script>
-  </head>
-  <body></body>
+      xhr.open("GET", GITHUB_ISSUES_LINK + issueNumber);
+      xhr.send();
+    }
+
+    redirect();
+  </script>
+</body>
 </html>
