@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>GitHub Issue Viewer</title>
@@ -11,14 +11,10 @@
       h1 {
         color: #0366d6;
       }
-      .issue-body {
+      p {
         color: #333;
       }
     </style>
-  </head>
-  <body>
-    <div id="issueContent"></div>
-
     <script>
       /**
        * Configuration goes here
@@ -32,17 +28,16 @@
        * DO NOT TOUCH ANYTHING BELOW THIS COMMENT UNLESS YOU KNOW WHAT YOU ARE DOING
        */
       function displayIssue(issue) {
-        var issueContent = document.getElementById("issueContent");
         var title = issue.title;
-        var body = issue.body_html;
+        var body = issue.body;
 
         var html = '<h1>' + title + '</h1>';
-        html += '<div class="issue-body">' + body + '</div>';
+        html += '<p>' + body + '</p>';
 
-        issueContent.innerHTML = html;
+        document.body.innerHTML = html;
       }
 
-      function fetchIssue() {
+      function redirect() {
         var location = window.location;
         var issueNumber = location.pathname.split("/")[
           PATH_SEGMENTS_TO_SKIP + 1
@@ -64,21 +59,24 @@
               displayIssue(payload);
             } else {
               console.error("Failed to fetch issue. Status code: " + xhr.status);
+              location.replace(homepage);
             }
           } catch (e) {
             console.error("Error parsing response:", e);
+            location.replace(homepage);
           }
         };
 
         xhr.onerror = function () {
           console.error("Network error occurred.");
+          location.replace(homepage);
         };
-
         xhr.open("GET", GITHUB_ISSUES_LINK + issueNumber);
         xhr.send();
       }
 
-      fetchIssue();
+      redirect();
     </script>
-  </body>
+  </head>
+  <body></body>
 </html>
