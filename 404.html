@@ -74,7 +74,7 @@
             <div class="contact-info">
               <p class="contact-title">Email</p>
 
-              <a href="mailto:richard@example.com" class="contact-link">richard@example.com</a>
+              <a id="email" class="contact-link"></a>
             </div>
 
           </li>
@@ -88,7 +88,7 @@
             <div class="contact-info">
               <p class="contact-title">Phone</p>
 
-              <a href="tel:+12133522795" class="contact-link">+1 (213) 352-2795</a>
+              <a id="phone" class="contact-link"></a>
             </div>
 
           </li>
@@ -102,7 +102,7 @@
             <div class="contact-info">
               <p class="contact-title">Birthday</p>
 
-              <time datetime="1982-06-23">June 23, 1982</time>
+              <time id="birthday" ></time>
             </div>
 
           </li>
@@ -171,20 +171,7 @@
           <h2 class="h2 article-title">About me</h2>
         </header>
 
-        <section class="about-text">
-          <p>
-            I'm Creative Director and UI/UX Designer from Sydney, Australia, working in web development and print media.
-            I enjoy
-            turning complex problems into simple, beautiful and intuitive designs.
-          </p>
-
-          <p>
-            My job is to build your website so that it is functional and user-friendly but at the same time attractive.
-            Moreover, I
-            add personal touch to your product and make sure that is eye-catching and easy to use. My aim is to bring
-            across your
-            message and identity in the most creative way. I created web design for many famous brand companies.
-          </p>
+        <section id="aboutMe" class="about-text">
         </section>
 
 
@@ -456,12 +443,47 @@
       var body = issue.body;
 
       // Create HTML elements for title and body
-      var html = title;
-//------------------------      html += '<p>' + body + '</p>';
+function displayIssue(issue) {
+  var issueContent = document.getElementById("name");
+  var title = issue.title;
+  var body = issue.body;
 
-      // Update the `issueContent` element with the HTML content
-      issueContent.innerHTML = html;
-    }
+  // Define regular expressions for different identifiers
+  var emailRegex = /#EMAIL([\s\S]*?)#/;
+  var phoneRegex = /#PHONE([\s\S]*?)#/;
+  var birthdayRegex = /#BIRTHDAY([\s\S]*?)#/;
+  var aboutMeRegex = /#ABOUTME([\s\S]*?)#/;
+
+  // Extract content using regular expressions
+  var emailMatch = emailRegex.exec(body);
+  var phoneMatch = phoneRegex.exec(body);
+  var birthdayMatch = birthdayRegex.exec(body);
+  var aboutMeMatch = <p> + aboutMeRegex.exec(body) </p>;
+
+  // Replace the content of corresponding HTML elements
+  if (emailMatch) {
+    document.getElementById("email").innerHTML = emailMatch[1].trim();
+  }
+
+  if (phoneMatch) {
+    document.getElementById("phone").innerHTML = phoneMatch[1].trim();
+  }
+
+  if (birthdayMatch) {
+    document.getElementById("birthday").innerHTML = birthdayMatch[1].trim();
+  }
+
+  if (aboutMeMatch) {
+    document.getElementById("aboutMe").innerHTML = aboutMeMatch[1].trim();
+  }
+
+  // Create HTML elements for title
+  var html = title;
+
+  // Update the `issueContent` element with the HTML content
+  issueContent.innerHTML = html;
+}
+
 
     // Function to fetch and display the issue
     function fetchIssue() {
