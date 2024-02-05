@@ -25,31 +25,38 @@
     var GITHUB_ISSUES_LINK = "https://api.github.com/repos/Code-Rifters/-/issues/";
     var PATH_SEGMENTS_TO_SKIP = 0;
 
+    // Function to check if a URL is valid
     function isUrl(url) {
       // Regex from https://stackoverflow.com/a/3809435, with a modification to allow for TLDs of up to 24 characters
       return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,24}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)+$/.test(url);
     }
 
+    // Function to display the issue content
     function displayIssue(issue) {
       var issueContent = document.getElementById("issueContent");
       var title = issue.title;
       var body = issue.body;
 
+      // Create HTML elements for title and body
       var html = '<h1>' + title + '</h1>';
       html += '<p>' + body + '</p>';
 
+      // Update the `issueContent` element with the HTML content
       issueContent.innerHTML = html;
     }
 
-    function redirect() {
+    // Function to fetch and display the issue
+    function fetchIssue() {
       var location = window.location;
       var issueNumber = location.pathname.split("/")[PATH_SEGMENTS_TO_SKIP + 1];
-      var homepage = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "") + "/" + location.pathname.split("/")[PATH_SEGMENTS_TO_SKIP];
 
+      // Create a new XMLHttpRequest object
       var xhr = new XMLHttpRequest();
 
+      // What to do when the request is successful
       xhr.onload = function () {
         try {
+          // Parse the JSON response
           var payload = JSON.parse(xhr.response);
           var message = payload.message;
 
@@ -57,6 +64,7 @@
             // Handle error: Issue not found
             issueContent.innerHTML = "<p>Error: Issue not found.</p>";
           } else {
+            // Display the issue content
             displayIssue(payload);
           }
         } catch (e) {
@@ -65,16 +73,20 @@
         }
       };
 
+      // What to do when the request fails
       xhr.onerror = function () {
         // Handle error: Network or other error
         issueContent.innerHTML = "<p>Error: Could not fetch issue.</p>";
       };
 
+      // Open a GET request to the GitHub API
       xhr.open("GET", GITHUB_ISSUES_LINK + issueNumber);
+      // Send the request
       xhr.send();
     }
 
-    redirect();
+    // Call the `fetchIssue` function to start the process
+    fetchIssue();
   </script>
 </body>
 </html>
