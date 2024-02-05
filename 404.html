@@ -11,7 +11,7 @@
       h1 {
         color: #0366d6;
       }
-      p {
+      .issue-body {
         color: #333;
       }
     </style>
@@ -34,10 +34,10 @@
       function displayIssue(issue) {
         var issueContent = document.getElementById("issueContent");
         var title = issue.title;
-        var body = issue.body;
+        var body = issue.body_html;
 
         var html = '<h1>' + title + '</h1>';
-        html += '<p>' + body + '</p>';
+        html += '<div class="issue-body">' + body + '</div>';
 
         issueContent.innerHTML = html;
       }
